@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Project_11</string>
+    <string name="tv_line_number_id">Line number (ID)</string>
+    <string name="tv_string_content">String content</string>
+    <string name="btnn_add_insert_string">Add (insert) string</string>
+    <string name="btnn_delete_string">Delete string</string>
+    <string name="btnn_update_string">Update string</string>
+</resources>
