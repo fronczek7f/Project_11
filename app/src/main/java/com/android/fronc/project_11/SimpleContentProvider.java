@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.HashMap;
 import java.util.Vector;
 
 public class SimpleContentProvider extends ContentProvider {
@@ -20,8 +19,6 @@ public class SimpleContentProvider extends ContentProvider {
 
     static final String ID = "id";
     static final String CONTENT = "content";
-
-    private static HashMap<String, String> CONTENT_PROJECTION_MAP;
 
     static final int CONTENTS = 1;
     static final int CONTENT_ID = 2;
@@ -63,28 +60,76 @@ public class SimpleContentProvider extends ContentProvider {
         Uri _uri;
         int dcId;
 
-//        if (values.get(ID) != "") {
-//            dcId = Integer.valueOf(values.get(ID).toString());
-//            _uri = ContentUris.withAppendedId(CONTENT_URI, dcId);
-//        } else {
-//        }
-
         String dcContent = values.get(CONTENT).toString();
         dataCollector.add(dcContent);
         dcId = dataCollector.indexOf(dcContent);
         _uri = ContentUris.withAppendedId(CONTENT_URI, dcId);
         getContext().getContentResolver().notifyChange(_uri, null);
+        System.out.println(dataCollector);
 
         return _uri;
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+
+        Uri _uri;
+        int dcId;
+        int deleted = 0;
+
+        switch (uriMatcher.match(uri)) {
+            case CONTENTS:
+                dataCollector.clear();
+                System.out.println(dataCollector);
+                break;
+
+            case CONTENT_ID:
+                dcId = Integer.valueOf(selection);
+                _uri = ContentUris.withAppendedId(CONTENT_URI, dcId);
+                dataCollector.add(Integer.valueOf(selection), "<null>");
+                getContext().getContentResolver().notifyChange(_uri, null);
+                deleted = Integer.valueOf(selection);
+                System.out.println(dataCollector);
+                break;
+
+            default:
+                break;
+        }
+
+        return deleted;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+
+        Uri _uri;
+        String dcContent;
+        int dcId;
+        int update = 0;
+
+        switch (uriMatcher.match(uri)) {
+            case CONTENTS:
+                dcContent = values.get(CONTENT).toString();
+                for (int i = 0; i < dataCollector.size(); i++) {
+                    dataCollector.set(i, dcContent);
+                }
+                System.out.println(dataCollector);
+                break;
+
+            case CONTENT_ID:
+                dcContent = values.get(CONTENT).toString();
+                dcId = Integer.valueOf(selection);
+                _uri = ContentUris.withAppendedId(CONTENT_URI, dcId);
+                dataCollector.add(Integer.valueOf(selection), dcContent);
+                getContext().getContentResolver().notifyChange(_uri, null);
+                update = Integer.valueOf(selection);
+                System.out.println(dataCollector);
+                break;
+
+            default:
+                break;
+        }
+
+        return update;
     }
 }
